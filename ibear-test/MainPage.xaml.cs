@@ -1,10 +1,12 @@
 ﻿using ibear_test.Database;
+using ibear_test.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.ServiceModel.Channels;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Popups;
@@ -14,9 +16,8 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
-
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace ibear_test
 {
@@ -73,9 +74,45 @@ namespace ibear_test
 
         }
 
-        private void lvContractors_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void lvContractors_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (lvContractors.SelectedIndex != -1)
+            {
+                var selected = lvContractors.SelectedItem as Contractor;
+                if (selected.Photo == null) photo.Source = new BitmapImage(new Uri("ms-appx:///Assets/avatar-placeholder.png"));
+                else photo.Source = await Conversion.ByteArrayToBitmapAsync(selected.Photo);
+                name.Text = selected.Name;
+                phone.Text = selected.Phone.ToString();
+                if (selected.Email != null) email.Text = selected.Email;
+                else email.Text = "";
+            }
+        }
 
+        private void name_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            var dataPackage = new DataPackage();
+            dataPackage.RequestedOperation = DataPackageOperation.Copy;
+            dataPackage.SetText(name.Text);
+            Clipboard.SetContent(dataPackage);
+        }
+
+        private void phone_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            var dataPackage = new DataPackage();
+            dataPackage.RequestedOperation = DataPackageOperation.Copy;
+            dataPackage.SetText(phone.Text);
+            Clipboard.SetContent(dataPackage);
+        }
+
+        private void email_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            if (email.Text != "")
+            {
+                var dataPackage = new DataPackage();
+                dataPackage.RequestedOperation = DataPackageOperation.Copy;
+                dataPackage.SetText(email.Text);
+                Clipboard.SetContent(dataPackage);
+            }
         }
     }
 }

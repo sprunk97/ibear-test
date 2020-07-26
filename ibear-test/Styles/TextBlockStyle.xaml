@@ -1,0 +1,10 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ibear_test">
+    <Style x:Key="infoBlock" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="Width" Value="Auto"/>
+        <Setter Property="Height" Value="Auto"/>
+    </Style>
+</ResourceDictionary>

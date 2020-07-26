@@ -12,6 +12,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles/ListViewStyle.xaml" />
+                <ResourceDictionary Source="Styles/TextBlockStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
@@ -25,10 +26,9 @@
     <Grid Margin="10 10 10 10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="10"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <ListView Grid.Column="0" Margin="0,0,0,10"
+        <ListView Grid.Column="0" Margin="0,0,20,0"
                   ItemContainerStyle="{StaticResource ListViewItemContainerStyle1}"
                   FontSize="26"
                   x:Name="lvContractors" Header="Список контрагентов"
@@ -39,11 +39,14 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <StackPanel x:Name="spInfo" Orientation="Vertical" Grid.Column="1">
-            <Image x:Name="photo" />
-            <TextBlock x:Name="name" />
-            <TextBlock x:Name="phone" />
-            <TextBlock x:Name="email" />
+        <StackPanel x:Name="spInfo" Orientation="Vertical" Grid.Column="1" HorizontalAlignment="Stretch">
+            <Image x:Name="photo" Width="300" Height="300"/>
+            <TextBlock x:Name="name"  Style="{StaticResource infoBlock}" Tapped="name_Tapped"
+                       ToolTipService.ToolTip="Click to copy"/>
+            <TextBlock x:Name="phone" Style="{StaticResource infoBlock}" Tapped="phone_Tapped"
+                       ToolTipService.ToolTip="Click to copy"/>
+            <TextBlock x:Name="email" Style="{StaticResource infoBlock}" Tapped="email_Tapped"
+                       ToolTipService.ToolTip="Click to copy"/>
         </StackPanel>
     </Grid>
 </Page>
