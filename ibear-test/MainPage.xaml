@@ -3,12 +3,47 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:ibear_test"
+    xmlns:localDB="using:ibear_test.Database"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
-    <Grid>
-
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/ListViewStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+    <Page.TopAppBar>
+        <CommandBar DefaultLabelPosition="Right">
+            <AppBarButton x:Name="createBtn" Label="Добавить" Icon="Add" Click="createBtn_Click"/>
+            <AppBarButton x:Name="removeBtn" Label="Удалить" Icon="Delete" Click="removeBtn_Click"/>
+            <AppBarButton x:Name="updateBtn" Label="Редактировать" Icon="Edit" Click="updateBtn_Click"/>
+        </CommandBar>
+    </Page.TopAppBar>
+    <Grid Margin="10 10 10 10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <ListView Grid.Column="0" Margin="0,0,0,10"
+                  ItemContainerStyle="{StaticResource ListViewItemContainerStyle1}"
+                  FontSize="26"
+                  x:Name="lvContractors" Header="Список контрагентов"
+                  SelectionMode="Single" SelectionChanged="lvContractors_SelectionChanged">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="localDB:Contractor">
+                    <TextBlock Text="{Binding Name}" FontSize="20"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <StackPanel x:Name="spInfo" Orientation="Vertical" Grid.Column="1">
+            <Image x:Name="photo" />
+            <TextBlock x:Name="name" />
+            <TextBlock x:Name="phone" />
+            <TextBlock x:Name="email" />
+        </StackPanel>
     </Grid>
 </Page>

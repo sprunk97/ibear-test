@@ -1,6 +1,8 @@
 ﻿using ibear_test.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Immutable;
+using System.Linq;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
