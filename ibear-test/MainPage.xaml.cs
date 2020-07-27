@@ -1,5 +1,6 @@
 ﻿using ibear_test.Database;
 using ibear_test.Tools;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,9 +22,6 @@ using Windows.UI.Xaml.Navigation;
 
 namespace ibear_test
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainPage : Page
     {
         public MainPage()
@@ -40,9 +38,24 @@ namespace ibear_test
             }
         }
 
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            if (e.Parameter != "")
+            {
+                var pars = (Contractor)e.Parameter;
+                using (var db = new ContractorsContext())
+                {
+                    db.Entry(pars).State = pars.ID == Guid.Empty ? EntityState.Added : EntityState.Modified;
+                    await db.SaveChangesAsync();
+                    lvContractors.ItemsSource = db.Contractors.ToList().OrderBy(x => x.Name);
+                }
+            }
+        }
+
         private void createBtn_Click(object sender, RoutedEventArgs e)
         {
-
+            Frame.Navigate(typeof(EditPage));
         }
 
         private async void removeBtn_Click(object sender, RoutedEventArgs e)
@@ -71,7 +84,18 @@ namespace ibear_test
 
         private void updateBtn_Click(object sender, RoutedEventArgs e)
         {
-
+            if (lvContractors.SelectedIndex != -1)
+            {
+                var selected = lvContractors.SelectedItem as Contractor;
+                var pars = new Contractor
+                {
+                    Photo = selected.Photo,
+                    Name = selected.Name,
+                    Email = selected.Email,
+                    Phone = selected.Phone
+                };
+                Frame.Navigate(typeof(EditPage), pars);
+            }
         }
 
         private async void lvContractors_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -79,8 +103,14 @@ namespace ibear_test
             if (lvContractors.SelectedIndex != -1)
             {
                 var selected = lvContractors.SelectedItem as Contractor;
-                if (selected.Photo == null) photo.Source = new BitmapImage(new Uri("ms-appx:///Assets/avatar-placeholder.png"));
-                else photo.Source = await Conversion.ByteArrayToBitmapAsync(selected.Photo);
+                if (selected.Photo == null)
+                {
+                    var bi = new BitmapImage(new Uri("ms-appx:///Assets/avatar-placeholder.png"));
+                    photo.Source = bi;
+                    photo.Source = await (photo.Source as BitmapImage).AsWriteableBitmapAsync();
+                }
+                else photo.Source = await selected.Photo.AsWriteableBitmapAsync();
+
                 name.Text = selected.Name;
                 phone.Text = selected.Phone.ToString();
                 if (selected.Email != null) email.Text = selected.Email;
