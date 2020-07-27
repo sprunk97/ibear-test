@@ -89,6 +89,7 @@ namespace ibear_test
                 var selected = lvContractors.SelectedItem as Contractor;
                 var pars = new Contractor
                 {
+                    ID = selected.ID,
                     Photo = selected.Photo,
                     Name = selected.Name,
                     Email = selected.Email,
@@ -109,12 +110,15 @@ namespace ibear_test
                     photo.Source = bi;
                     photo.Source = await (photo.Source as BitmapImage).AsWriteableBitmapAsync();
                 }
-                else photo.Source = await selected.Photo.AsWriteableBitmapAsync();
+                else
+                    photo.Source = await selected.Photo.AsWriteableBitmapAsync();
 
                 name.Text = selected.Name;
                 phone.Text = selected.Phone.ToString();
-                if (selected.Email != null) email.Text = selected.Email;
-                else email.Text = "";
+                if (selected.Email != null)
+                    email.Text = selected.Email;
+                else
+                    email.Text = "";
             }
         }
 

@@ -24,6 +24,7 @@ namespace ibear_test.Tools
     public sealed partial class EditPage : Page
     {
         private bool used_placeholder = true;
+        private Guid guid = Guid.Empty;
 
         public EditPage()
         {
@@ -56,6 +57,7 @@ namespace ibear_test.Tools
                     photo.Source = await selected.Photo.AsWriteableBitmapAsync();
                     used_placeholder = false;
                 }
+                guid = selected.ID;
                 name.Text = selected.Name;
                 phone.Text = selected.Phone.ToString();
                 if (selected.Email != null) email.Text = selected.Email;
@@ -89,6 +91,7 @@ namespace ibear_test.Tools
             var ph = used_placeholder ? null : await ((WriteableBitmap)photo.Source).AsByteArrayAsync();
             var pars = new Contractor
             {
+                ID = guid,
                 Photo = ph,
                 Name = name.Text,
                 Email = email.Text,
