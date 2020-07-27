@@ -27,12 +27,26 @@ namespace ibear_test.Tools
         public async static Task<WriteableBitmap> AsWriteableBitmapAsync(this BitmapImage bi)
         {
             var file = await StorageFile.GetFileFromApplicationUriAsync(bi.UriSource);
-            var stream = await file.OpenReadAsync();
-            var decoder = await BitmapDecoder.CreateAsync(stream);
-            var size = new BitmapSize { Width = decoder.PixelWidth, Height = decoder.PixelHeight };
-            var wb = new WriteableBitmap((int)size.Width, (int)size.Height);
-            await wb.SetSourceAsync(stream);
-            return wb;
+            using (var stream = await file.OpenReadAsync())
+            {
+                var decoder = await BitmapDecoder.CreateAsync(stream);
+                var size = new BitmapSize { Width = decoder.PixelWidth, Height = decoder.PixelHeight };
+                var wb = new WriteableBitmap((int)size.Width, (int)size.Height);
+                await wb.SetSourceAsync(stream);
+                return wb;
+            }
+        } 
+
+        public async static Task<WriteableBitmap> AsWriteableBitmapAsync(this BitmapImage bi, StorageFile file)
+        {
+            using (var stream = await file.OpenReadAsync())
+            {
+                var decoder = await BitmapDecoder.CreateAsync(stream);
+                var size = new BitmapSize { Width = decoder.PixelWidth, Height = decoder.PixelHeight };
+                var wb = new WriteableBitmap((int)size.Width, (int)size.Height);
+                await wb.SetSourceAsync(stream);
+                return wb;
+            }
         }
 
         public static async Task<byte[]> AsByteArrayAsync(this WriteableBitmap wb)

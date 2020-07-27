@@ -17,8 +17,6 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
-
 namespace ibear_test.Tools
 {
     public sealed partial class EditPage : Page
@@ -100,9 +98,25 @@ namespace ibear_test.Tools
             Frame.Navigate(typeof(MainPage), pars);
         }
 
-        private void uploadBtn_Click(object sender, RoutedEventArgs e)
+        private async void uploadBtn_Click(object sender, RoutedEventArgs e)
         {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
+            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.ComputerFolder;
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpeg");
+            picker.FileTypeFilter.Add(".png");
 
+            var file = await picker.PickSingleFileAsync();
+            if (file != null)
+            {
+                var uri = new Uri("empty:empty");
+                Uri.TryCreate(file.Path, UriKind.Absolute, out uri);
+                var bi = new BitmapImage(uri);
+                photo.Source = bi;
+                photo.Source = await (photo.Source as BitmapImage).AsWriteableBitmapAsync(file);
+                used_placeholder = false;
+            }
         }
     }
 }
