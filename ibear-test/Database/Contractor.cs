@@ -17,6 +17,9 @@ namespace ibear_test.Database
 
         [DisplayName("Фото")]
         public byte[] Photo { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+
 
         [DisplayName("e-mail")]
         public string Email { get; set; }
