@@ -2,21 +2,11 @@
 using ibear_test.Tools;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.ServiceModel.Channels;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
@@ -41,7 +31,7 @@ namespace ibear_test
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            if (e.Parameter != "")
+            if (e.Parameter.GetType() != typeof(string))
             {
                 var pars = (Contractor)e.Parameter;
                 using (var db = new ContractorsContext())
@@ -93,7 +83,9 @@ namespace ibear_test
                     Photo = selected.Photo,
                     Name = selected.Name,
                     Email = selected.Email,
-                    Phone = selected.Phone
+                    Phone = selected.Phone,
+                    Width = selected.Width,
+                    Height = selected.Height
                 };
                 Frame.Navigate(typeof(EditPage), pars);
             }
@@ -108,10 +100,9 @@ namespace ibear_test
                 {
                     var bi = new BitmapImage(new Uri("ms-appx:///Assets/avatar-placeholder.png"));
                     photo.Source = bi;
-                    photo.Source = await (photo.Source as BitmapImage).AsWriteableBitmapAsync();
                 }
                 else
-                    photo.Source = await selected.Photo.AsWriteableBitmapAsync();
+                    photo.Source = await selected.Photo.AsWBAsync(selected.Width, selected.Height);
 
                 name.Text = selected.Name;
                 phone.Text = selected.Phone.ToString();
@@ -122,31 +113,12 @@ namespace ibear_test
             }
         }
 
-        private void name_Tapped(object sender, TappedRoutedEventArgs e)
+        private void CopyToClipboard(object sender, TappedRoutedEventArgs e)
         {
             var dataPackage = new DataPackage();
             dataPackage.RequestedOperation = DataPackageOperation.Copy;
-            dataPackage.SetText(name.Text);
+            dataPackage.SetText((sender as TextBlock).Text);
             Clipboard.SetContent(dataPackage);
-        }
-
-        private void phone_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            var dataPackage = new DataPackage();
-            dataPackage.RequestedOperation = DataPackageOperation.Copy;
-            dataPackage.SetText(phone.Text);
-            Clipboard.SetContent(dataPackage);
-        }
-
-        private void email_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            if (email.Text != "")
-            {
-                var dataPackage = new DataPackage();
-                dataPackage.RequestedOperation = DataPackageOperation.Copy;
-                dataPackage.SetText(email.Text);
-                Clipboard.SetContent(dataPackage);
-            }
         }
     }
 }
