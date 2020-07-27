@@ -43,11 +43,11 @@
                     Grid.Column="1"
                     HorizontalAlignment="Stretch">
             <Image x:Name="photo" Width="300" Height="300"/>
-            <TextBlock x:Name="name"  Style="{StaticResource infoBlock}" Tapped="name_Tapped"
+            <TextBlock x:Name="name"  Style="{StaticResource infoBlock}" Tapped="CopyToClipboard"
                        ToolTipService.ToolTip="Click to copy"/>
-            <TextBlock x:Name="phone" Style="{StaticResource infoBlock}" Tapped="phone_Tapped"
+            <TextBlock x:Name="phone" Style="{StaticResource infoBlock}" Tapped="CopyToClipboard"
                        ToolTipService.ToolTip="Click to copy"/>
-            <TextBlock x:Name="email" Style="{StaticResource infoBlock}" Tapped="email_Tapped"
+            <TextBlock x:Name="email" Style="{StaticResource infoBlock}" Tapped="CopyToClipboard"
                        ToolTipService.ToolTip="Click to copy"/>
         </StackPanel>
     </Grid>
