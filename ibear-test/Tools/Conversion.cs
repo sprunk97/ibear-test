@@ -1,62 +1,51 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
-using Windows.Storage.Streams;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace ibear_test.Tools
 {
     public static class Conversion
     {
-        public async static Task<WriteableBitmap> AsWriteableBitmapAsync(this byte[] bytes)
+        public async static Task<WriteableBitmap> AsWBAsync(this byte[] bytes, int maxWidth, int maxHeight)
         {
-            using (var stream = new InMemoryRandomAccessStream())
+            var wb = new WriteableBitmap(maxWidth, maxHeight);
+            using (var buffer = wb.PixelBuffer.AsStream())
             {
-                await stream.WriteAsync(bytes.AsBuffer());
-                stream.Seek(0);
-                var decoder = await BitmapDecoder.CreateAsync(stream);
-                var size = new BitmapSize { Width = decoder.PixelWidth, Height = decoder.PixelHeight };
-                var wb = new WriteableBitmap((int)size.Width, (int)size.Height);
-                await wb.SetSourceAsync(stream);
-                return wb;
+                await buffer.WriteAsync(bytes, 0, bytes.Length);
+                await buffer.FlushAsync();
             }
+            return wb;
         }
 
-        public async static Task<WriteableBitmap> AsWriteableBitmapAsync(this BitmapImage bi)
+        public async static Task<(WriteableBitmap, int, int)> AsResizedWBAsync(this StorageFile file, uint width, uint height)
         {
-            var file = await StorageFile.GetFileFromApplicationUriAsync(bi.UriSource);
             using (var stream = await file.OpenReadAsync())
             {
                 var decoder = await BitmapDecoder.CreateAsync(stream);
-                var size = new BitmapSize { Width = decoder.PixelWidth, Height = decoder.PixelHeight };
-                var wb = new WriteableBitmap((int)size.Width, (int)size.Height);
-                await wb.SetSourceAsync(stream);
-                return wb;
-            }
-        } 
+                width = width > decoder.PixelWidth ? width : decoder.PixelWidth;
+                height = height > decoder.PixelHeight ? height : decoder.PixelHeight;
+                var transform = new BitmapTransform() { ScaledWidth = width, ScaledHeight = height, InterpolationMode = BitmapInterpolationMode.Cubic };
+                var pixelData = await decoder.GetPixelDataAsync(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied,
+                    transform, ExifOrientationMode.RespectExifOrientation, ColorManagementMode.ColorManageToSRgb);
+                var pixels = pixelData.DetachPixelData();
 
-        public async static Task<WriteableBitmap> AsWriteableBitmapAsync(this BitmapImage bi, StorageFile file)
-        {
-            using (var stream = await file.OpenReadAsync())
-            {
-                var decoder = await BitmapDecoder.CreateAsync(stream);
-                var size = new BitmapSize { Width = decoder.PixelWidth, Height = decoder.PixelHeight };
-                var wb = new WriteableBitmap((int)size.Width, (int)size.Height);
-                await wb.SetSourceAsync(stream);
-                return wb;
+                return (await pixels.AsWBAsync((int)width, (int)height), (int)width, (int)height);
             }
         }
 
         public static async Task<byte[]> AsByteArrayAsync(this WriteableBitmap wb)
         {
-            using (var stream = new InMemoryRandomAccessStream())
+            using (var stream = wb.PixelBuffer.AsStream())
             {
-                var result = await stream.ReadAsync(wb.PixelBuffer, wb.PixelBuffer.Length, InputStreamOptions.None);
-                return result.ToArray();
+                var buffer = new byte[stream.Length];
+                await stream.ReadAsync(buffer, 0, buffer.Length);
+                stream.Seek(0, SeekOrigin.Begin);
+                return buffer;
             }
         }
-
     }
 }
